@@ -25,9 +25,10 @@ export default class Dashboard extends Component {
   render() {
 
     this.state = { 
-      // displayName: firebase.auth().user.displayName,
-    //   uid: firebase.auth().user.uid
+        displayName: firebase.auth().currentUser.displayName,
+        uid: firebase.auth().currentUser.uid
     }
+    
     return (
       <View style={styles.container}>
         <Text style = {styles.textStyle}>

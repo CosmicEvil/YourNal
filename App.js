@@ -1,19 +1,17 @@
 import "react-native-gesture-handler";
 import React, { useState, useEffect } from 'react';
-
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
-
 import SummaryOfJournal from "./src/components/SummaryOfJournal";
 import HomeScreen from "./src/components/HomeScreen";
 import { Icon } from "react-native-elements/dist/icons/Icon";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
-
+import Toast from 'react-native-toast-message';
 import Login from './src/components/login';
 import Signup from './src/components/signup';
 import Dashboard from './src/components/dashboard';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import firebase from "./src/firebase/firebase.utils";
+import firebase from "./src/firebase/firebase.utils";``
+
 const Stack = createStackNavigator();
 let initial = "Home";
 
@@ -35,11 +33,10 @@ export default function App() {
 
   if (!user) {
     initial = "Login";
-
   } else {
     console.log(firebase.auth().currentUser);
-
   }
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -53,7 +50,7 @@ export default function App() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
-      }}>      
+      }}>
       <Stack.Screen
         name="Signup"
         component={Signup}
@@ -107,6 +104,7 @@ export default function App() {
         }
       />
       </Stack.Navigator>
+      <Toast innerRef={(ref) => Toast.setRef(ref)} />
     </NavigationContainer>
   );
 }

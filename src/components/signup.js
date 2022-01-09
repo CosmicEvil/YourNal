@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, TextInput, Alert, ActivityIndicator } from 'react-native';
 import firebase from '../firebase/firebase.utils';
 import { Button } from 'react-native-elements/dist/buttons/Button';
-
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 export default class Signup extends Component {
   constructor() {
     super();
@@ -43,10 +43,19 @@ export default class Signup extends Component {
           email: '',
           password: ''
         })
-        this.props.navigation.navigate('Login')
+        this.props.navigation.navigate('Home')
       })
-      .catch(error => this.setState({ errorMessage: error.message }))
-    }
+      .catch(error => {
+        console.log(error.message)
+
+        Toast.show({
+        type: 'error',
+        text1: 'Something went wrong, please try again!',
+        position: 'bottom'
+       });
+    this.setState({ isLoading: false,
+    errorMessage: error.message })}
+    )    }
   }
 
   render() {
@@ -84,9 +93,7 @@ export default class Signup extends Component {
           title="Signup"
           onPress={() => this.registerUser()}
         />
-        <Text style={styles.loginText}>
-          Or sign up with your Google Account!
-        </Text>
+      
      
         <Text 
           style={styles.loginText}

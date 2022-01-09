@@ -6,13 +6,14 @@ import firebase from '../firebase/firebase.utils';
 import { Button } from 'react-native-elements/dist/buttons/Button';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { googleProvider } from '../firebase/firebase.utils';
-import { signInWithGoogle } from '../firebase/firebase.utils';
+import Toast from 'react-native-toast-message';
+
 export default class Login extends Component {
   
   constructor() {
     super();
     this.state = { 
-      email: '', 
+      email: '',
       password: '',
       isLoading: false
     }
@@ -25,17 +26,21 @@ export default class Login extends Component {
   }
 
   userLogin = () => {
+    // const auth = getAuth();
     if(this.state.email === '' && this.state.password === '') {
-      Alert.alert('Enter details to signin!')
+      Toast.show({
+        type: 'error',
+        text1: 'Enter details to login',
+        position: 'bottom'
+      });    
     } else {
       this.setState({
         isLoading: true,
       })
-      firebase
-      .auth()
-      .signInWithEmailAndPassword(this.state.email, this.state.password)
-      .then((res) => {
-        console.log(res)
+
+      firebase.auth().signInWithEmailAndPassword(this.state.email.toString(), this.state.password)
+      .then((userCredential) => {
+        console.log(userCredential)
         console.log('User logged-in successfully!')
         this.setState({
           isLoading: false,
@@ -44,28 +49,56 @@ export default class Login extends Component {
         })
         this.props.navigation.navigate('Home')
       })
-      .catch(error => this.setState({ errorMessage: error.message }))
+      .catch(error => {
+        console.log(error.message)
+         
+        this.setState({ isLoading: false,
+        errorMessage: error.message })
+        var errorCode = error.code;
+        let errorMsg = 'Something went wrong';
 
+        if ( errorCode == 'auth/wrong-password' ) {
+            errorMsg = 'Wrong password';
+        } else if ( errorCode == 'auth/invalid-email' ) {
+          errorMsg = 'Please provide a valid email';
+        } else if ( errorCode == 'auth/invalid-email' ) {
+          errorMsg = 'Please provide a valid email';
+        } 
+
+        Toast.show({
+          type: 'error',
+          text1: errorMsg,
+          position: 'bottom'
+         });
+      })
     }
   }
 
- signInWithGoogle = () => {
-  this.setState({
-    isLoading: true,
-  })
-  firebase.auth().signInWithPopup(googleProvider).then((res) => 
-  {
-    console.log(res)
-    console.log('User logged-in successfully!')
+  signInWithGoogle = () => {
     this.setState({
-      isLoading: false,
-      email: '', 
-      password: ''
+      isLoading: true,
     })
-    this.props.navigation.navigate('Home')
-  })
-    .catch(error => this.setState({ errorMessage: error.message }))
-  }
+    firebase.auth().signInWithPopup(googleProvider).then((res) => 
+    {
+      console.log(res)
+      console.log('User logged-in successfully!')
+      this.setState({
+        isLoading: false,
+        email: '',
+        password: ''
+      })
+      this.props.navigation.navigate('Home')
+    })
+    .catch(error => {
+      Toast.show({
+      type: 'error',
+      text1: 'Something went wrong, please try again!',
+      position: 'bottom'
+    });
+      this.setState({ isLoading: false,
+      errorMessage: error.message })}
+      )
+    }
 
 
   render() {

@@ -31,14 +31,14 @@ export default function SummaryOfJournal ({ navigation }) {
           // navigation.navigate("Journal");
           Toast.show({
             text1: 'Item removed!',
-            position: 'top'
+            position: 'bottom'
           });
         }).catch((err) => {
           console.error(err);
           Toast.show({
             type: 'error',
             text1: 'An error occurred and the item could not be removed',
-            position: 'top'
+            position: 'bottom'
           });
         });
     })
@@ -46,7 +46,7 @@ export default function SummaryOfJournal ({ navigation }) {
       console.error(err);
       Toast.show({
         type: 'error',
-        text1: 'An error occurred and a new item could not be saved',
+        text1: 'An error occurred and a new item could not be fetched',
         position: 'bottom'
       });
     });

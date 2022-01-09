@@ -9,7 +9,7 @@ import Toast from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
 import { prompts } from '../prompts';
 import * as Yup from 'yup';
-
+import { usersCollection } from '../firebase/firebase.utils';
 export default function HomeScreen ({ navigation }) {
 
 const { getItem, setItem } = useAsyncStorage('journal');
@@ -23,7 +23,7 @@ const { getItem, setItem } = useAsyncStorage('journal');
         Toast.show({
             type: 'error',
             text1: 'Journal Entry is required',
-            position: 'top'
+            position: 'bottom'
         });
         return;
     }
@@ -38,22 +38,21 @@ const { getItem, setItem } = useAsyncStorage('journal');
         body: values.body
       });
       setRandomElement(prompts[Math.floor(Math.random() * prompts.length)]);
-
+      // usersCollection
       //set item in storage again
       setItem(JSON.stringify(journal))
         .then(() => {
           // navigation.navigate("Journal");
           Toast.show({
-            type: 'error',
             text1: 'Added the entry!',
-            position: 'top'
+            position: 'bottom'
           });
         }).catch((err) => {
           console.error(err);
           Toast.show({
             type: 'error',
             text1: 'An error occurred and a new item could not be saved',
-            position: 'top'
+            position: 'bottom'
           });
         });
     })
@@ -66,11 +65,11 @@ const { getItem, setItem } = useAsyncStorage('journal');
       });
     });
   }
+
   useEffect(() => {
     // action on update of movies
     console.log("randomElement",randomElement);
     setTitle(randomElement);
-    
   }, [randomElement]);
   return (
     <Formik
@@ -101,8 +100,6 @@ const { getItem, setItem } = useAsyncStorage('journal');
     </Formik>
   )
 }
-
-
 const style = StyleSheet.create({
   container: {
     marginTop: 0,
@@ -126,7 +123,6 @@ const style = StyleSheet.create({
   input: {
     marginTop: 10,
     marginBottom: 10,
-    // backgroundColor: "#D8DAD3"
     backgroundColor: "#Fff",
     borderRadius: 20,
     padding:20

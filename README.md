@@ -6,8 +6,10 @@
 ## 🚀 Still to do!
 
 - firestore implementation for the saved lists
+- More options for the prompts (toggle for without)
 - Meditation timer page
+- daily inspirational quote?
 - Dashboard with insights
 - Solidity/ethereum nft creating as gamification
-- Betterr styling
+- Better styling
 

@@ -14,12 +14,10 @@ const firebaseConfig = {
   measurementId: "G-8RW0NJT62W",
 };
 
-
-
 firebase.initializeApp(firebaseConfig);
 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-export const auth = firebase.auth();
+// export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
 export const googleProvider = new firebase.auth.GoogleAuthProvider();

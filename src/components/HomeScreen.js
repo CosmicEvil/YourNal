@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Switch } from 'react-native';
 import { Text } from 'react-native-elements';
 import { Button } from 'react-native-elements/dist/buttons/Button';
 import { Input } from 'react-native-elements/dist/input/Input';
@@ -16,7 +16,13 @@ const { getItem, setItem } = useAsyncStorage('journal');
 
   const [randomElement, setRandomElement] = useState(prompts[Math.floor(Math.random() * prompts.length)]);
   const [title, setTitle] = useState(randomElement);
+  const [isEnabled, setIsEnabled] = useState(false);
+  const toggleSwitch = () => {
+    setIsEnabled(previousState => !previousState);
+    isEnabled ?
+    setTitle("Regular Journal Entry") :setTitle(randomElement);
 
+  };
   function newTask (values) {
 
 	if(!values.body){
@@ -83,7 +89,21 @@ const { getItem, setItem } = useAsyncStorage('journal');
         formik => (
         <View style={style.container}>
           <Text h2 style={style.title} >Welcome to YourNal</Text>
-          <Text h4 style={style.subtitle} >{title}</Text>
+          {
+            isEnabled ?
+            <Text h4 style={style.subtitle} >{title}</Text>
+            : null
+          }
+          <View style={style.toggle}>
+            <Text style={style.subtitleTwo} >Do you want a prompt?</Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#A4C2A5" }}
+              thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleSwitch}
+              value={isEnabled}
+            />
+          </View>
           <Input
            value={formik.values.body}
             multiline = {true}
@@ -120,6 +140,12 @@ const style = StyleSheet.create({
     textAlign: 'center',
     color: "#4A4A48"
   },
+  subtitleTwo:{
+    marginRight:10,
+    height: 20,
+    textAlign: 'left',
+    color: "#4A4A48"
+  },
   input: {
     marginTop: 10,
     marginBottom: 10,
@@ -129,6 +155,15 @@ const style = StyleSheet.create({
   },
   button: {
     backgroundColor: '#A4C2A5'
+  },
+  toggle:{
+    flex: 0.1,
+    flexDirection: 'row',
+    color: "#A4C2A5",
+    fontSize: 10,
+    justifyContent:'center',
+    textAlign: 'left',
+    width: "90%"
   }
 })
 

@@ -22,7 +22,9 @@ export default class Signup extends Component {
     this.setState(state);
   }
 
-  registerUser = () => {
+  registerUser = (event) => {
+    event.preventDefault();
+
     if(this.state.email === '' && this.state.password === '') {
       Alert.alert('Enter details to signup!')
     } else {
@@ -91,7 +93,7 @@ export default class Signup extends Component {
         <Button
           style={styles.loginButton}
           title="Signup"
-          onPress={() => this.registerUser()}
+          onPress={(event) => this.registerUser()}
         />
       
      

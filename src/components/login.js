@@ -25,7 +25,9 @@ export default class Login extends Component {
     this.setState(state);
   }
 
-  userLogin = () => {
+  userLogin = (event) => {
+    event.preventDefault();
+
     // const auth = getAuth();
     if(this.state.email === '' && this.state.password === '') {
       Toast.show({
@@ -74,7 +76,9 @@ export default class Login extends Component {
     }
   }
 
-  signInWithGoogle = () => {
+  signInWithGoogle = (event) => {
+    event.preventDefault();
+
     this.setState({
       isLoading: true,
     })
@@ -128,12 +132,12 @@ export default class Login extends Component {
         <Button
           style={styles.loginButton}
           title="Signin"
-          onPress={() => this.userLogin()}
+          onPress={() => this.userLogin(event)}
         />
         <Button
           style={styles.loginButtonGoogle}
           title="Signin with google"
-          onPress={() => this.signInWithGoogle()}
+          onPress={() => this.signInWithGoogle(event)}
         />
         <Text 
           style={styles.loginText}

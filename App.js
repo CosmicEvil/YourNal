@@ -4,6 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import SummaryOfJournal from "./src/components/SummaryOfJournal";
 import HomeScreen from "./src/components/HomeScreen";
+import InspirationalMessage from "./src/components/InspirationalMessage";
+import MeditationTimer from "./src/components/meditationTimer";
 import { Icon } from "react-native-elements/dist/icons/Icon";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import Toast from 'react-native-toast-message';
@@ -71,6 +73,20 @@ export default function App() {
         headerRight: () => (
           <View style={style.iconContainer}>
             <Icon
+              name="mail"
+              type="feather"
+              color="#fff"
+              style={style.headerIcon}
+              onPress={() => navigation.navigate("Inspiration")}
+            />
+            <Icon
+              name="clock"
+              type="feather"
+              color="#fff"
+              style={style.headerIcon}
+              onPress={() => navigation.navigate("Inspiration")}
+            />
+            <Icon
               name="book"
               type="feather"
               color="#fff"
@@ -96,11 +112,25 @@ export default function App() {
           { title: 'Dashboard' }
         }
       />
+      <Stack.Screen
+        name="Timer"
+        component={MeditationTimer}
+        options={
+          { title: 'Timer' }
+        }
+      />
        <Stack.Screen
         name="Journal"
         component={SummaryOfJournal}
         options={
           { title: 'Journal' }
+        }
+      />
+       <Stack.Screen
+        name="Inspiration"
+        component={InspirationalMessage}
+        options={
+          { title: 'Inspiraton' }
         }
       />
       </Stack.Navigator>

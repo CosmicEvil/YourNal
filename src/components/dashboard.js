@@ -1,8 +1,10 @@
 // components/dashboard.js
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import firebase from '../firebase/firebase.utils';
+import { Text } from 'react-native-elements';
+import { Button } from 'react-native-elements/dist/buttons/Button';
 
 
 export default class Dashboard extends Component {

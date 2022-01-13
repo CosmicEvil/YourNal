@@ -15,15 +15,14 @@ import firebase from '../firebase/firebase.utils';
 export default function HomeScreen ({ navigation }) {
 
   const [randomElement, setRandomElement] = useState(prompts[Math.floor(Math.random() * prompts.length)]);
-  const [title, setTitle] = useState(randomElement);
+  const [title, setTitle] = useState("Regular Journal Entry");
   const [isEnabled, setIsEnabled] = useState(false);
   const [user, setUser] = useState(firebase.auth().currentUser);
 
   const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState);
     isEnabled ?
-    setTitle("Regular Journal Entry") :setTitle(randomElement);
-
+    setTitle("Regular Journal Entry") : setTitle(randomElement);
   };
 
   const saveItem = async (values,userAuth) => {
@@ -44,12 +43,20 @@ export default function HomeScreen ({ navigation }) {
 
     try {
       const key = uuid.v4()
+      const snapShot = await userRef.collection('journalList').get();
+      if (!snapShot.exists) {
+        console.log("doesnt exist yet");
+      }
+      // let titleParsed = ""
+      // isEnabled ? titleParsed = "RegularJournalEntry" : titleParsed = "RegularJournalEntry" ;
+      console.log(isEnabled + " " + title);
       await userRef.collection('journalList').doc(key).set({
-        key:key,
-        time: new Date(),
-        question: title,
-        body: values.body
+          key:key,
+          time: new Date(),
+          question: title,
+          body: values.body
       });
+
       setRandomElement(prompts[Math.floor(Math.random() * prompts.length)]);
       Toast.show({
         text1: 'Added the entry!',
@@ -66,16 +73,14 @@ export default function HomeScreen ({ navigation }) {
         position: 'bottom'
       });
     }
-   
   }
-
 
   useEffect(() => {
     // action on update of movies
     console.log("randomElement",randomElement);
-    setTitle(randomElement);
+    isEnabled ?
+    setTitle(randomElement) :   setTitle("Regular Journal Entry") ;  
   }, [randomElement]);
-
 
   return (
     <Formik

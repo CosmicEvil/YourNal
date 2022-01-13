@@ -84,7 +84,7 @@ export default function App() {
               type="feather"
               color="#fff"
               style={style.headerIcon}
-              onPress={() => navigation.navigate("Inspiration")}
+              onPress={() => navigation.navigate("Timer")}
             />
             <Icon
               name="book"

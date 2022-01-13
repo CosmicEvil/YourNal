@@ -24,12 +24,5 @@ const styles = StyleSheet.create({
       flexDirection: 'reverse-column',
       alignItems: 'center',
       backgroundColor: "#F1F2EB"
-    },
-    message:{
-
-    },
-    author:{
-
     }
-
   })

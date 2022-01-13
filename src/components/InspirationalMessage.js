@@ -16,7 +16,6 @@ export default function InspirationalMessage ({ navigation }) {
       const response = await fetch(url);
       let data = await response.json();
       let random = Math.floor(Math.random() * data.length);
-    //   console.log(data[random].text);
       setAuthor(data[random].author);
       setContent(data[random].text);
     }

@@ -2,7 +2,9 @@
 
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, TextInput, Alert, ActivityIndicator } from 'react-native';
-import firebase from '../firebase/firebase.utils';
+// import firebase from '../firebase/firebase.utils';
+import { auth, createUserProfileDocument } from '../firebase/firebase.utils';
+
 import { Button } from 'react-native-elements/dist/buttons/Button';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 export default class Signup extends Component {
@@ -22,42 +24,47 @@ export default class Signup extends Component {
     this.setState(state);
   }
 
-  registerUser = (event) => {
-    event.preventDefault();
+  registerUser = async event => {
+    //event.preventDefault();
+    const { displayName, email, password } = this.state;
 
-    if(this.state.email === '' && this.state.password === '') {
-      Alert.alert('Enter details to signup!')
-    } else {
+    if(email === '' && password === '') {
+      Alert.alert('Enter details to signup!');
+      return;
+    } 
+    
+    try {
       this.setState({
         isLoading: true,
       })
-      firebase
-      .auth()
-      .createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then((res) => {
-        res.user.updateProfile({
-          displayName: this.state.displayName
-        })
-        console.log('User registered successfully!')
-        this.setState({
-          isLoading: false,
-          displayName: '',
-          email: '',
-          password: ''
-        })
-        this.props.navigation.navigate('Home')
-      })
-      .catch(error => {
-        console.log(error.message)
 
-        Toast.show({
+      const { user } = await auth.createUserWithEmailAndPassword(
+        email,
+        password
+      );
+
+      await createUserProfileDocument(user,   { displayName });
+      this.setState({
+        displayName: '',
+        email: '',
+        password: '',
+        isLoading: false,
+      });
+      console.log('User registered successfully!')
+      this.props.navigation.navigate('Home')
+
+
+    } catch (error) {
+      console.error(error);
+      Toast.show({
         type: 'error',
         text1: 'Something went wrong, please try again!',
-        position: 'bottom'
-       });
-    this.setState({ isLoading: false,
-    errorMessage: error.message })}
-    )    }
+        position: 'bottom'});
+      this.setState(
+        { isLoading: false,
+        errorMessage: error.message 
+      });
+    }
   }
 
   render() {

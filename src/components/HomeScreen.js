@@ -4,86 +4,86 @@ import { StyleSheet, View, Switch } from 'react-native';
 import { Text } from 'react-native-elements';
 import { Button } from 'react-native-elements/dist/buttons/Button';
 import { Input } from 'react-native-elements/dist/input/Input';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
 import { prompts } from '../prompts';
 import * as Yup from 'yup';
-import { usersCollection } from '../firebase/firebase.utils';
-export default function HomeScreen ({ navigation }) {
+import { firestore } from '../firebase/firebase.utils';
+import firebase from '../firebase/firebase.utils';
 
-const { getItem, setItem } = useAsyncStorage('journal');
+// import { usersCollection } from '../firebase/firebase.utils';
+export default function HomeScreen ({ navigation }) {
 
   const [randomElement, setRandomElement] = useState(prompts[Math.floor(Math.random() * prompts.length)]);
   const [title, setTitle] = useState(randomElement);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [user, setUser] = useState(firebase.auth().currentUser);
+
   const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState);
     isEnabled ?
     setTitle("Regular Journal Entry") :setTitle(randomElement);
 
   };
-  function newTask (values) {
 
-	if(!values.body){
-        Toast.show({
-            type: 'error',
-            text1: 'Journal Entry is required',
-            position: 'bottom'
-        });
-        return;
+  const saveItem = async (values,userAuth) => {
+   // let userID = Auth.auth().currentUser?.uid
+   if(!values.body){
+    Toast.show({
+        type: 'error',
+        text1: 'Journal Entry is required',
+        position: 'bottom'
+    });
+    return;
     }
-    getItem()
-    .then((journalJSON) => {
-      let journal = journalJSON ? JSON.parse(journalJSON) : [];
-      //add a new item to the list
-      journal.push({
-        id: uuid.v4(),
+
+
+    if (!userAuth) return;
+
+    const userRef = firestore.doc(`users/${userAuth.uid}`);
+
+    try {
+      const key = uuid.v4()
+      await userRef.collection('journalList').doc(key).set({
+        key:key,
         time: new Date(),
         question: title,
         body: values.body
       });
       setRandomElement(prompts[Math.floor(Math.random() * prompts.length)]);
-      // usersCollection
-      //set item in storage again
-      setItem(JSON.stringify(journal))
-        .then(() => {
-          // navigation.navigate("Journal");
-          Toast.show({
-            text1: 'Added the entry!',
-            position: 'bottom'
-          });
-        }).catch((err) => {
-          console.error(err);
-          Toast.show({
-            type: 'error',
-            text1: 'An error occurred and a new item could not be saved',
-            position: 'bottom'
-          });
-        });
-    })
-    .catch((err) => {
-      console.error(err);
+      Toast.show({
+        text1: 'Added the entry!',
+        position: 'bottom'
+      });
+
+      navigation.navigate('Journal')
+
+    } catch (error) {
+      console.log('error creating user: ', error.message);
       Toast.show({
         type: 'error',
         text1: 'An error occurred and a new item could not be saved',
         position: 'bottom'
       });
-    });
+    }
+   
   }
+
 
   useEffect(() => {
     // action on update of movies
     console.log("randomElement",randomElement);
     setTitle(randomElement);
   }, [randomElement]);
+
+
   return (
     <Formik
       initialValues={{body: ''}}
       onSubmit={(values, {resetForm}) => {    
-        console.log('Hi :',values);
+        console.log('Hi :' + title,values.body);
         resetForm({ values: '' })
-        newTask(values);
+        saveItem(values, user);
       }}>
       {
         formik => (

@@ -1,107 +1,110 @@
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Card } from 'react-native-elements';
 import { Icon } from "react-native-elements/dist/icons/Icon";
 import Toast from 'react-native-toast-message';
-
+import { firestore } from '../firebase/firebase.utils';
+import firebase from '../firebase/firebase.utils';
 export default function SummaryOfJournal ({ navigation }) {
-  const { getItem, setItem } = useAsyncStorage('journal');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(firebase.auth().currentUser);
 
-// Clear entry werkt nog niet -> komt dit nog adden maar kan in firebase deel gedaan worden
-  function clearEntry(id){
-    console.log("clearing");
-    // setItems(items.filter(item => item !== id));
-    getItem()
-    .then((journalJSON) => {
-      let journal = journalJSON ? JSON.parse(journalJSON) : [];
-      //remove item from list
-      journal= journal.filter(function(element) {
-        return element.id !== id;
-      });
-      console.log("ID " + id);
-      console.log( journal);
-      setItems(journal);
-     
-      //set item in storage again
-      setItem(JSON.stringify(journal))
-        .then(() => {
-          // navigation.navigate("Journal");
-          Toast.show({
-            text1: 'Item removed!',
-            position: 'bottom'
-          });
-        }).catch((err) => {
-          console.error(err);
-          Toast.show({
-            type: 'error',
-            text1: 'An error occurred and the item could not be removed',
-            position: 'bottom'
-          });
-        });
-    })
-    .catch((err) => {
-      console.error(err);
-      Toast.show({
-        type: 'error',
-        text1: 'An error occurred and a new item could not be fetched',
-        position: 'bottom'
-      });
-    });
+
+  const clearEntryFirebase = async (id) => {
+
+    if (!user) {
+     Toast.show({
+       type: 'error',
+       text1: 'Not logged in!',
+       position: 'top'
+     });
+     return;
+   };
+
+    const userRef = firestore.doc(`users/${user.uid}`);
+
+   try {
+    await userRef.collection('journalList').doc(id).delete()
+    const snapshot = await userRef.collection('journalList').get()
+    setItems(snapshot.docs.map(doc => doc.data()).sort((a, b) => b.time - a.time));
+    setLoading(false);
+
+   } catch (error) {
+     console.log('error deleting the item: ', error.message);
+     Toast.show({
+         type: 'error',
+         text1: 'An error occurred',
+         position: 'top'
+     });
+   }
   }
 
-  function getJournalList () {
 
-    getItem()
-      .then((journalJSON) => {
-        // clearAllData();
-        const journal = journalJSON ? JSON.parse(journalJSON) : [];
-        setItems(journal.reverse());
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        Toast.show({
+  const fetchJournals = async (values) => {
+    setLoading(true);
+
+    if (!user) {
+      Toast.show({
+        type: 'error',
+        text1: 'Not logged in!',
+        position: 'top'
+      });
+      return;
+    };
+
+     const userRef = firestore.doc(`users/${user.uid}`);
+
+    try {
+      const snapshot = await userRef.collection('journalList').get()
+      setItems(snapshot.docs.map(doc => doc.data()).sort((a, b) => b.time - a.time));
+      console.log(items)
+      setLoading(false);
+
+    } catch (error) {
+      console.log('error fetching the list: ', error.message);
+      Toast.show({
           type: 'error',
           text1: 'An error occurred',
           position: 'top'
-        });
       });
-  }
+    }
+
+   }
+
+  useEffect(() => {
+    fetchJournals();
+  }, []);
 
   function renderCard ({item}) {
     return (
       <Card>
         <View style={styles.delete}>
-        <Icon
-              name="trash"
-              type="feather"
-              color="#566246"
-              size="8"
-              onPress={() => clearEntry(item.id)}
-            />
-          </View>
-         <Card.Title style={styles.cardDate}>
-         <Text> {
-            new Date(item.time).toLocaleDateString()
-          }</Text>
+          <Icon
+                name="trash"
+                type="feather"
+                color="#566246"
+                size="8"
+                onPress={() => clearEntryFirebase(item.key)}
+              />
+        </View>
+        <Card.Title style={styles.cardDate}>
+          <Text>
+            {item.time.toDate().toDateString()}
+          </Text>
         </Card.Title>
         <Card.FeaturedTitle style={styles.cardTitle}>
-        {item.question}
+          {item.question}
         </Card.FeaturedTitle>
         <Card.Divider />
-        <Text style={styles.cardContent}>{item.body}</Text>
+        <Text style={styles.cardContent}>
+          {item.body}
+        </Text>
       </Card>
     )
   }
   
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', getJournalList);
-
-    return unsubscribe;
-  }, [])
+ 
 
   return (
     <View style={styles.container}>
@@ -114,8 +117,8 @@ export default function SummaryOfJournal ({ navigation }) {
         </Card>
       :
       <FlatList refreshing={loading}
-        onRefresh={getJournalList} style={styles.list} data={items}
-        renderItem={renderCard} keyExtractor={(item) => item.id} />
+        onRefresh={fetchJournals} style={styles.list} data={items}
+        renderItem={renderCard} keyExtractor={(item) => item.key} />
         }
     </View>
   )

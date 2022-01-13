@@ -34,7 +34,7 @@ export default class Login extends Component {
         type: 'error',
         text1: 'Enter details to login',
         position: 'bottom'
-      });    
+      });
     } else {
       this.setState({
         isLoading: true,
@@ -99,8 +99,10 @@ export default class Login extends Component {
       text1: 'Something went wrong, please try again!',
       position: 'bottom'
     });
-      this.setState({ isLoading: false,
-      errorMessage: error.message })}
+      this.setState({
+        isLoading: false,
+        errorMessage: error.message
+      })}
       )
     }
 

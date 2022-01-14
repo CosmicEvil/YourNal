@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { Card } from 'react-native-elements';
+import { FlatList, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { Card, Text } from 'react-native-elements';
 import { Icon } from "react-native-elements/dist/icons/Icon";
 import Toast from 'react-native-toast-message';
 import { firestore } from '../firebase/firebase.utils';
@@ -9,7 +9,6 @@ export default function SummaryOfJournal ({ navigation }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(firebase.auth().currentUser);
-
 
   const clearEntryFirebase = async (id) => {
 
@@ -42,7 +41,7 @@ export default function SummaryOfJournal ({ navigation }) {
 
 
   const fetchJournals = async (values) => {
-    setLoading(true);
+    
 
     if (!user) {
       Toast.show({
@@ -53,7 +52,7 @@ export default function SummaryOfJournal ({ navigation }) {
       return;
     };
 
-     const userRef = firestore.doc(`users/${user.uid}`);
+    const userRef = firestore.doc(`users/${user.uid}`);
 
     try {
       const snapshot = await userRef.collection('journalList').get()
@@ -69,10 +68,10 @@ export default function SummaryOfJournal ({ navigation }) {
           position: 'top'
       });
     }
-
-   }
+  }
 
   useEffect(() => {
+    setLoading(true);
     fetchJournals();
   }, []);
 
@@ -104,7 +103,13 @@ export default function SummaryOfJournal ({ navigation }) {
     )
   }
   
- 
+  if(loading){
+    return(
+      <View style={styles.preloader}>
+        <ActivityIndicator size="large" color="#9E9E9E"/>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -157,5 +162,15 @@ const styles = StyleSheet.create({
   delete:{
     position: 'absolute', right: 0, top: 0, zIndex: 10,
     
+  },
+  preloader: {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F1F2EB'
   }
 })

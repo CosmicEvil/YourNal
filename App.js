@@ -38,7 +38,42 @@ export default function App() {
   } else {
     console.log(firebase.auth().currentUser);
   }
-
+  const headerRightList = ({ navigation }) => (
+    {
+    headerRight: () => (
+      <View style={style.iconContainer}>
+        <Icon
+          name="mail"
+          type="feather"
+          color="#fff"
+          style={style.headerIcon}
+          onPress={() => navigation.navigate("Inspiration")}
+        />
+        <Icon
+          name="clock"
+          type="feather"
+          color="#fff"
+          style={style.headerIcon}
+          onPress={() => navigation.navigate("Timer")}
+        />
+        <Icon
+          name="book"
+          type="feather"
+          color="#fff"
+          style={style.headerIcon}
+          onPress={() => navigation.navigate("Journal")}
+        />
+        <Icon
+          name="user"
+          type="feather"
+          color="#fff"
+          style={style.headerIcon}
+          onPress={() => navigation.navigate("Dashboard")}
+        />
+    </View>
+  )
+}
+)
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -109,28 +144,29 @@ export default function App() {
         name="Dashboard"
         component={Dashboard}
         options={
-          { title: 'Dashboard' }
+          { title: 'Dashboard' }, headerRightList
         }
+        
       />
       <Stack.Screen
         name="Timer"
         component={MeditationTimer}
         options={
-          { title: 'Timer' }
+          { title: 'Timer' }, headerRightList
         }
       />
        <Stack.Screen
         name="Journal"
         component={SummaryOfJournal}
         options={
-          { title: 'Journal' }
+          { title: 'Journal' }, headerRightList
         }
       />
        <Stack.Screen
         name="Inspiration"
         component={InspirationalMessage}
         options={
-          { title: 'Inspiraton' }
+          { title: 'Inspiraton' }, headerRightList
         }
       />
       </Stack.Navigator>

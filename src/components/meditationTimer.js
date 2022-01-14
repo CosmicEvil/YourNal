@@ -9,12 +9,9 @@ export default function MeditationTimer ({ navigation }) {
         <View style={styles.container}>
             <Text h2 style={styles.message}>{inspirationalMessage}</Text>
             <Text style={styles.author}>{inspirationalMessageAuthor}</Text>
-
         </View>
       )
-
 }
-
 
 const styles = StyleSheet.create({
     container: {
